@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gjuras staff desk</title>
+  <meta name="robots" content="noindex" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'self'; connect-src 'self'; base-uri 'self'; form-action 'self';" />
+  <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root { --red:#c4161c; --ink:#101114; --panel:#181a1f; --line:#2a2d34; --text:#ece8e2; --mute:#9a958c; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Inter, system-ui, sans-serif; background: var(--ink); color: var(--text); min-height: 100vh; }
+    button, input, select, textarea { font: inherit; }
+    a { color: #e8b4b4; }
+    .login-wrap { min-height: 100vh; display: grid; place-items: center; padding: 24px; }
+    .login {
+      width: min(420px, 100%); background: var(--panel); border: 1px solid var(--line); padding: 32px;
+    }
+    h1 { font-family: "Cormorant Garamond", serif; font-size: 36px; font-weight: 500; }
+    .sub { color: var(--mute); font-size: 13px; margin: 8px 0 22px; line-height: 1.5; }
+    label { display: block; margin: 12px 0 6px; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--mute); }
+    input, select, textarea { width: 100%; padding: 10px 12px; background: #111; border: 1px solid var(--line); color: var(--text); }
+    .go { margin-top: 18px; width: 100%; background: var(--red); color: #fff; border: 0; padding: 12px; letter-spacing: .14em; text-transform: uppercase; cursor: pointer; }
+    .err { color: #e07a7a; font-size: 13px; margin-top: 12px; min-height: 1.2em; }
+    .hint { margin-top: 18px; font-size: 12px; color: var(--mute); line-height: 1.5; }
+
+    .desk { display: none; }
+    .desk.on { display: block; }
+    header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 16px 22px; border-bottom: 1px solid var(--line);
+    }
+    .logo { font-family: "Cormorant Garamond", serif; letter-spacing: .16em; font-size: 22px; }
+    header nav { display: flex; gap: 14px; align-items: center; font-size: 13px; }
+    header button { background: none; border: 1px solid var(--line); color: var(--text); padding: 7px 10px; cursor: pointer; }
+    .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; padding: 18px 22px; }
+    .kpi { background: var(--panel); border: 1px solid var(--line); padding: 16px; }
+    .kpi span { display: block; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--mute); }
+    .kpi strong { display: block; margin-top: 8px; font-size: 26px; font-family: "Cormorant Garamond", serif; font-weight: 500; }
+    .kpi em { font-style: normal; font-size: 12px; color: #8fca9a; }
+    .kpi em.down { color: #e07a7a; }
+    .layout { display: grid; grid-template-columns: 1.4fr .8fr; gap: 16px; padding: 0 22px 28px; }
+    .box { background: var(--panel); border: 1px solid var(--line); padding: 16px; }
+    .box h2 { font-size: 14px; letter-spacing: .12em; text-transform: uppercase; color: var(--mute); margin-bottom: 12px; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    th { color: var(--mute); font-weight: 500; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
+    .st { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
+    .pending { color: #e6c07b; }
+    .confirmed { color: #8fca9a; }
+    .seated, .completed { color: #7eb0e0; }
+    .cancelled { color: #888; text-decoration: line-through; }
+    .actions button { margin-right: 4px; margin-top: 4px; background: #111; border: 1px solid var(--line); color: var(--text); padding: 4px 7px; cursor: pointer; font-size: 11px; }
+    .bars { display: grid; gap: 10px; }
+    .bar-row { font-size: 12px; }
+    .bar-row b { display: flex; justify-content: space-between; font-weight: 500; margin-bottom: 4px; }
+    .track { height: 8px; background: #111; }
+    .fill { height: 8px; background: var(--red); }
+    .fill.ok { background: #3d8f5c; }
+    @media (max-width: 900px) {
+      .kpis, .layout { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="login-wrap" id="login-screen">
+    <form class="login" id="login-form" autocomplete="on">
+      <h1>Staff desk</h1>
+      <p class="sub">Managers only. This demo login lives in the browser. On a real launch it moves behind HTTPS and a proper auth provider.</p>
+      <label for="email">Email</label>
+      <input id="email" name="email" type="email" autocomplete="username" required />
+      <label for="password">Password</label>
+      <input id="password" name="password" type="password" autocomplete="current-password" required />
+      <button class="go" type="submit">Sign in</button>
+      <p class="err" id="login-err"></p>
+      <p class="hint">Demo login<br>manager@gjuras.local<br>BathAve1560!</p>
+      <p class="hint"><a href="index.html">← Back to the door</a></p>
+    </form>
+  </div>
+
+  <div class="desk" id="desk">
+    <header>
+      <div class="logo">GJURAS DESK</div>
+      <nav>
+        <span id="who"></span>
+        <a href="index.html">Floor</a>
+        <button type="button" id="logout">Sign out</button>
+      </nav>
+    </header>
+    <section class="kpis" id="kpis"></section>
+    <section class="layout">
+      <div class="box">
+        <h2>Reservations</h2>
+        <div style="overflow:auto">
+          <table>
+            <thead>
+              <tr><th>Code</th><th>When</th><th>Guest</th><th>Party</th><th>Status</th><th></th></tr>
+            </thead>
+            <tbody id="book-rows"></tbody>
+          </table>
+        </div>
+        <div class="box" style="margin-top:16px">
+          <h2>Walk-in stock (manual)</h2>
+          <table>
+            <thead><tr><th>Item</th><th>On hand</th><th>Par</th><th></th></tr></thead>
+            <tbody id="stock-rows"></tbody>
+          </table>
+        </div>
+      </div>
+      <div>
+        <div class="box" style="margin-bottom:16px">
+          <h2>Today by category</h2>
+          <div class="bars" id="cat-bars"></div>
+        </div>
+        <div class="box" style="margin-bottom:16px">
+          <h2>This week vs budget</h2>
+          <div class="bars" id="bars"></div>
+        </div>
+        <div class="box" style="margin-bottom:16px">
+          <h2>Log a ticket</h2>
+          <p class="sub" style="margin-top:0">Cash in the drawer or card on the receipt. One line, same as a POS close.</p>
+          <label>Total ($)</label>
+          <input id="t-amount" type="number" min="0" step="0.01" />
+          <label>Category</label>
+          <select id="t-cat">
+            <option value="grill">Grill</option>
+            <option value="kitchen">Kitchen</option>
+            <option value="bar">Bar</option>
+            <option value="other">Other</option>
+          </select>
+          <label>Tender</label>
+          <select id="t-tender">
+            <option value="cash">Cash</option>
+            <option value="card">Card / receipt</option>
+          </select>
+          <label>Note</label>
+          <input id="t-note" type="text" maxlength="80" placeholder="Table 4 · qofte" />
+          <button class="go" id="log-ticket" type="button">Add ticket</button>
+          <p class="err" id="ticket-msg"></p>
+        </div>
+        <div class="box">
+          <h2>Budget targets</h2>
+          <label>Weekly rent ($)</label>
+          <input id="b-rent" type="number" min="0" />
+          <label>Utilities ($)</label>
+          <input id="b-util" type="number" min="0" />
+          <label>Food cost target %</label>
+          <input id="b-food" type="number" min="0" max="80" />
+          <label>Labor target %</label>
+          <input id="b-labor" type="number" min="0" max="80" />
+          <button class="go" id="save-budget" type="button">Save targets</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script src="js/store.js"></script>
+  <script src="js/manager.js"></script>
+</body>
+</html>

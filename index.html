@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gjuras — Food, coffee and good times</title>
+  <meta name="description" content="Gjuras. 1560 Bath Ave. Albanian food, coffee and good times. Reserve a table." />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'self'; connect-src 'self'; base-uri 'self'; form-action 'self';" />
+  <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --red: #c4161c;
+      --red-deep: #8e0e12;
+      --ink: #0c0c0d;
+      --cream: #f3eee6;
+      --muted: #b7b0a6;
+      --line: rgba(255,255,255,.12);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { background: #0a0a0b; color: var(--cream); font-family: Inter, system-ui, sans-serif; height: 100%; overflow: hidden; }
+    body.in { overflow: auto; }
+    button, input, select, textarea { font: inherit; }
+    a { color: inherit; }
+    img { max-width: 100%; display: block; }
+    .facade { max-width: none; }
+
+    #front {
+      position: fixed; inset: 0; z-index: 40;
+      display: flex; align-items: center; justify-content: center;
+      background: #0a0a0b;
+    }
+    #front.gone { display: none; }
+    .bleed {
+      position: absolute; inset: -8%;
+      background: url("images/storefront.jpg") center 42% / cover no-repeat;
+      filter: blur(32px) saturate(1.05) brightness(.38);
+      transform: scale(1.08);
+      pointer-events: none;
+    }
+    .stage {
+      position: relative;
+      width: min(100vw, calc(100dvh * 0.75));
+      height: min(100dvh, calc(100vw / 0.75));
+    }
+    .facade {
+      width: 100%; height: 100%;
+      object-fit: contain;
+      object-position: center;
+      display: block;
+      pointer-events: none;
+    }
+    .store, .veil { display: none; }
+    #front.opening .brand, #front.opening .door-hint, #front.opening .tiny {
+      opacity: 0; pointer-events: none; transition: opacity .2s ease;
+    }
+    .door {
+      position: absolute;
+      left: 58.8%;
+      top: 39.8%;
+      width: 14%;
+      height: 40%;
+      padding: 0; border: 0; background: transparent;
+      perspective: 1800px;
+      cursor: pointer;
+      z-index: 6;
+    }
+    .leaf {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      object-fit: fill;
+      max-width: none;
+      transform-origin: right center;
+      transition: transform 1.2s cubic-bezier(.7,.05,.2,1);
+    }
+    .handle { display: none; }
+    #front.opening .leaf { transform: rotateY(88deg); }
+    .door-hint {
+      position: absolute; left: 50%; top: 40%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      background: rgba(0,0,0,.58);
+      color: #fff;
+      padding: 7px 11px;
+      font-size: 10px; letter-spacing: .18em; text-transform: uppercase;
+      animation: pulse 2.4s ease-in-out infinite;
+      z-index: 7;
+    }
+    @keyframes pulse { 50% { opacity: .55; } }
+
+    .brand { display: none; }
+    .eyebrow { letter-spacing: .28em; text-transform: uppercase; font-size: 11px; color: #f0b8b8; margin-bottom: 12px; }
+    h1 { font-family: "Cormorant Garamond", serif; font-size: clamp(40px, 7vh, 84px); line-height: .85; font-weight: 500; }
+    .tag { margin-top: 14px; font-style: italic; font-family: "Cormorant Garamond", serif; font-size: 22px; color: #f0d9d9; }
+    .meta { margin-top: 18px; color: var(--muted); font-size: 13px; line-height: 1.7; }
+    .enter {
+      margin-top: 28px;
+      background: var(--red); color: #fff; border: 0;
+      padding: 14px 22px; letter-spacing: .16em; text-transform: uppercase;
+      font-size: 12px; cursor: pointer;
+    }
+    .enter:hover { background: var(--red-deep); }
+    .tiny { display: none; }
+
+    header {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 20;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 16px 24px;
+      background: linear-gradient(to bottom, rgba(0,0,0,.7), transparent);
+      opacity: 0; pointer-events: none; transition: opacity .5s .3s;
+    }
+    body.in header { opacity: 1; pointer-events: auto; }
+    .logo { font-family: "Cormorant Garamond", serif; font-size: 26px; letter-spacing: .14em; text-decoration: none; color: #fff; }
+    nav { display: flex; gap: 18px; align-items: center; }
+    nav a, nav button.link {
+      background: none; border: 0; color: #e8dede; text-decoration: none;
+      font-size: 12px; letter-spacing: .14em; text-transform: uppercase; cursor: pointer;
+    }
+    nav a:hover, nav button.link:hover { color: #fff; }
+
+    .room {
+      min-height: 100dvh;
+      position: relative;
+      background: url("images/room.jpg") center/cover no-repeat;
+    }
+    .room::after {
+      content: ""; position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,.7), rgba(0,0,0,.15) 40%, rgba(0,0,0,.25));
+      pointer-events: none;
+    }
+    .hot {
+      position: absolute; z-index: 4; border: 0; cursor: pointer;
+      background: rgba(8,8,8,.72); color: #fff;
+      padding: 16px 22px;
+      letter-spacing: .14em; text-transform: uppercase;
+      font-size: 16px; font-weight: 500;
+      backdrop-filter: blur(8px);
+    }
+    .hot:hover, .hot:focus { background: var(--red); }
+    .hot.bar { left: 50%; top: 26%; transform: translateX(-50%); }
+    .hot.tables { left: 50%; top: 68%; transform: translateX(-50%); }
+
+    .room-copy {
+      position: absolute; left: 28px; bottom: 36px; z-index: 4; max-width: 480px;
+    }
+    .room-copy h2 { font-family: "Cormorant Garamond", serif; font-size: clamp(32px, 5vw, 52px); font-weight: 500; }
+    .room-copy p { margin: 8px 0 0; color: #d7cfc6; font-size: 14px; line-height: 1.6; }
+
+    .strip { background: #111; padding: 72px 24px; }
+    .wrap { max-width: 980px; margin: 0 auto; }
+    .strip h2 { font-family: "Cormorant Garamond", serif; font-size: 40px; font-weight: 500; margin: 8px 0 12px; }
+    .strip p { color: #b7b0a6; max-width: 620px; line-height: 1.7; }
+    .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 32px; }
+    .card { border: 1px solid var(--line); padding: 20px; }
+    .card h3 { font-family: "Cormorant Garamond", serif; font-size: 22px; margin-bottom: 8px; }
+    .card p { font-size: 13px; }
+    .menu-foods { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin: 8px 0 18px; }
+    .menu-foods img { width: 100%; height: 88px; object-fit: cover; }
+
+    footer {
+      padding: 22px 24px; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+      border-top: 1px solid var(--line); color: #8a8580; font-size: 12px;
+    }
+
+    .overlay {
+      position: fixed; inset: 0; z-index: 50; background: rgba(0,0,0,.68);
+      display: none; align-items: center; justify-content: center; padding: 20px;
+    }
+    .overlay.show { display: flex; }
+    .panel {
+      background: #f6f1ea; color: #1b1512; width: min(480px, 100%);
+      max-height: 92vh; overflow: auto; padding: 28px; position: relative;
+    }
+    .panel.wide { width: min(1080px, 100%); padding: 0; background: #14110f; color: #f3eee6; }
+    .x { position: absolute; top: 10px; right: 14px; border: 0; background: none; font-size: 24px; cursor: pointer; color: inherit; }
+    .panel h3 { font-family: "Cormorant Garamond", serif; font-size: 32px; font-weight: 500; }
+    .help { color: #6f675d; font-size: 13px; margin: 6px 0 16px; }
+    label { display: block; margin: 12px 0 6px; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; }
+    input, select, textarea {
+      width: 100%; padding: 10px 12px; border: 1px solid #d4cbc0; background: #fff; color: #1b1512;
+    }
+    .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .slots { display: flex; flex-wrap: wrap; gap: 6px; }
+    .slot { border: 1px solid #d4cbc0; background: #fff; padding: 8px 10px; cursor: pointer; font-size: 13px; }
+    .slot.on { background: #1b1512; color: #fff; }
+    .slot.full { opacity: .35; cursor: not-allowed; }
+    .msg { margin-top: 12px; font-size: 13px; min-height: 1.2em; }
+    .ok { color: #1d6b3a; }
+    .err { color: #9b1c1c; }
+
+    .menu-grid { display: grid; grid-template-columns: 280px 1fr; min-height: 70vh; }
+    .menu-photo { background: url("images/bar.jpg") center/cover no-repeat; min-height: 220px; }
+    .menu-list { padding: 28px 26px 36px; overflow: auto; max-height: 80vh; }
+    .menu-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 22px 28px; }
+    .sec { margin-bottom: 8px; }
+    .sec h4 {
+      font-family: "Cormorant Garamond", serif; font-size: 20px; font-weight: 500;
+      letter-spacing: .08em; color: #e07a7a; margin: 14px 0 8px;
+      border-bottom: 1px solid rgba(196,22,28,.35); padding-bottom: 4px;
+    }
+    .dish { display: grid; grid-template-columns: 64px 1fr auto; gap: 10px; align-items: center; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,.06); }
+    .dish img { width: 64px; height: 48px; object-fit: cover; }
+    .dish b { font-size: 13px; font-weight: 500; }
+    .dish p { color: #9a9186; font-size: 11px; margin-top: 2px; }
+    .price { color: #f0d9d9; font-size: 13px; white-space: nowrap; }
+
+    @media (max-width: 800px) {
+      .brand { max-width: 70%; left: 4%; top: 3%; }
+      h1 { font-size: 40px; }
+      .tag { font-size: 16px; }
+      .meta { display: none; }
+      header nav { gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
+      .grid3, .menu-grid, .menu-cols, .cols { grid-template-columns: 1fr; }
+      .hot { font-size: 15px; padding: 14px 16px; min-height: 48px; }
+      .tiny { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <section id="front">
+    <div class="bleed" aria-hidden="true"></div>
+    <div class="stage">
+    <img class="facade" src="images/storefront-open.jpg" alt="Gjuras, 1560 Bath Ave" width="1500" height="2000" />
+    <button class="door" id="doors" type="button" title="Open the door" aria-label="Open the door">
+      <img class="leaf" src="images/door-leaf.png" alt="" />
+      <span class="door-hint">Click the door</span>
+    </button>
+    <div class="brand">
+      <div class="eyebrow">1560 Bath Ave · 315-231-5541</div>
+      <h1>Gjuras</h1>
+      <p class="tag">food, coffee and good times</p>
+      <p class="meta">Albanian kitchen on Bath Ave. Click the glass doors to come in.</p>
+    </div>
+    <div class="tiny">Placeholder interior until house photos arrive</div>
+    </div>
+  </section>
+
+  <header>
+    <a class="logo" href="index.html">GJURAS</a>
+    <nav>
+      <button class="link" id="nav-reserve" type="button">Reserve</button>
+      <button class="link" id="nav-menu" type="button">Menu</button>
+      <a href="tel:3152315541">315-231-5541</a>
+      <a href="manager.html">Staff</a>
+    </nav>
+  </header>
+
+  <section class="room" id="room">
+    <button class="hot bar" id="bar-hit" type="button">Look at the menu</button>
+    <button class="hot tables" id="table-hit" type="button">Reserve a table</button>
+    <div class="room-copy">
+      <div class="eyebrow">Mirë se vini</div>
+      <h2>Ten tables.<br>Bar in the back.</h2>
+      <p>Menu over the bar. Reserve over the tables.</p>
+    </div>
+  </section>
+
+  <section class="strip" id="about">
+    <div class="wrap">
+      <div class="eyebrow">About</div>
+      <h2>The house on Bath Ave</h2>
+      <p>This is the family’s page. Swap this paragraph for how Gjuras started, who is in the kitchen, and why the table still looks like home.</p>
+      <p style="margin-top:14px">1560 Bath Ave · <a href="tel:3152315541">315-231-5541</a> · <a href="https://maps.google.com/?q=1560+Bath+Ave" target="_blank" rel="noopener">Directions</a></p>
+      <p style="margin-top:8px">Hours: put the real board here before you sell this. Wrong hours get you a one-star the first night.</p>
+      <div class="grid3">
+        <div class="card"><h3>Tables</h3><p>Ten two-to-four tops. One request — the floor picks the seat.</p></div>
+        <div class="card"><h3>Bar</h3><p>Coffee by day, raki at night. The menu is the paper list, on screen.</p></div>
+        <div class="card"><h3>Staff desk</h3><p>Sign-in for the book and for logging cash or card tickets.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <span>Gjuras · 1560 Bath Ave · 315-231-5541</span>
+    <span>Reservations stay on this device until the site is hosted. Do not collect a guest list you cannot delete.</span>
+  </footer>
+
+  <div class="overlay" id="reserve-modal">
+    <div class="panel">
+      <button class="x" data-close type="button">&times;</button>
+      <h3>Reserve a table</h3>
+      <p class="help">Phone, email, or both. One is enough. Both means both get the confirmation.</p>
+      <div class="cols">
+        <div>
+          <label for="r-date">Date</label>
+          <input id="r-date" type="date" required />
+        </div>
+        <div>
+          <label for="r-party">Party</label>
+          <select id="r-party">
+            <option>1</option><option>2</option><option selected>3</option><option>4</option>
+            <option>5</option><option>6</option><option>7</option><option>8</option>
+          </select>
+        </div>
+      </div>
+      <label>Time</label>
+      <div class="slots" id="slots"></div>
+      <label for="r-name">Name</label>
+      <input id="r-name" type="text" maxlength="80" autocomplete="name" />
+      <div class="cols">
+        <div>
+          <label for="r-phone">Phone</label>
+          <input id="r-phone" type="tel" maxlength="32" autocomplete="tel" placeholder="For a text" />
+        </div>
+        <div>
+          <label for="r-email">Email</label>
+          <input id="r-email" type="email" maxlength="80" autocomplete="email" placeholder="Or an email" />
+        </div>
+      </div>
+      <label for="r-notes">Notes</label>
+      <textarea id="r-notes" rows="2" maxlength="200" placeholder="High chair, allergies, window…"></textarea>
+      <button class="enter" id="book" type="button" style="width:100%;margin-top:18px">Request table</button>
+      <p class="msg" id="book-msg"></p>
+    </div>
+  </div>
+
+  <div class="overlay" id="menu-modal">
+    <div class="panel wide">
+      <button class="x" data-close type="button" style="color:#fff">&times;</button>
+      <div class="menu-grid">
+        <div class="menu-photo"></div>
+        <div class="menu-list">
+          <div class="eyebrow">Bath Avenue Coffee &amp; Restaurant</div>
+          <h3>Menu</h3>
+          <p class="help" style="color:#b7b0a6">Paper menu, on screen. Stand-in plates until the kitchen shoots its own.</p>
+          <div class="menu-cols">
+            <div>
+              <div class="sec">
+                <h4>Sallata · Salads</h4>
+                <div class="dish"><img src="images/menu/salad.jpg" alt=""><div><b>1 person salad</b></div><span class="price">10</span></div>
+                <div class="dish"><img src="images/menu/salad.jpg" alt=""><div><b>2 person salad</b></div><span class="price">15</span></div>
+                <div class="dish"><img src="images/menu/caesar.jpg" alt=""><div><b>Caesar salad</b></div><span class="price">10</span></div>
+                <div class="dish"><img src="images/menu/caesar-chicken.jpg" alt=""><div><b>Caesar chicken</b></div><span class="price">15</span></div>
+                <div class="dish"><img src="images/menu/caprese.jpg" alt=""><div><b>Caprese</b><p>Kapreze</p></div><span class="price">15</span></div>
+              </div>
+              <div class="sec">
+                <h4>Supe · Soup</h4>
+                <div class="dish"><img src="images/menu/soup-chicken.jpg" alt=""><div><b>Supe pule</b><p>Chicken soup</p></div><span class="price">8</span></div>
+                <div class="dish"><img src="images/menu/soup-veg.jpg" alt=""><div><b>Supe perime</b><p>Vegetable soup</p></div><span class="price">8</span></div>
+                <div class="dish"><img src="images/menu/soup-fish.jpg" alt=""><div><b>Supe peshku</b><p>Fish soup</p></div><span class="price">8</span></div>
+                <div class="dish"><img src="images/menu/pasul.jpg" alt=""><div><b>Pasul</b><p>Bean stew</p></div><span class="price">10</span></div>
+                <div class="dish"><img src="images/menu/pilaf.jpg" alt=""><div><b>Pilaf</b></div><span class="price">8</span></div>
+              </div>
+              <div class="sec">
+                <h4>Gjella · Stew</h4>
+                <div class="dish"><img src="images/menu/tasqebap.jpg" alt=""><div><b>Tasqebap</b></div><span class="price">12</span></div>
+                <div class="dish"><img src="images/menu/meat-potato.jpg" alt=""><div><b>Mish me patate</b><p>Meat and potatoes</p></div><span class="price">15</span></div>
+                <div class="dish"><img src="images/menu/stuffed.jpg" alt=""><div><b>Speca + patëllxhan të mbushur</b><p>Stuffed pepper and eggplant</p></div><span class="price">10</span></div>
+              </div>
+              <div class="sec">
+                <h4>Specialet · Specials</h4>
+                <div class="dish"><img src="images/menu/sofra.jpg" alt=""><div><b>Sofra e shtëpisë</b><p>House spread</p></div><span class="price">25</span></div>
+                <div class="dish"><img src="images/menu/fli.jpg" alt=""><div><b>Fli / byrek</b></div><span class="price">8</span></div>
+                <div class="dish"><img src="images/menu/mantia.jpg" alt=""><div><b>Mantia</b><p>Meat or cheese</p></div><span class="price">10</span></div>
+              </div>
+              <div class="sec">
+                <h4>Pule · Chicken</h4>
+                <div class="dish"><img src="images/menu/grilled-chicken.jpg" alt=""><div><b>Grilled chicken</b><p>With fries</p></div><span class="price">15</span></div>
+                <div class="dish"><img src="images/menu/fingers.jpg" alt=""><div><b>Chicken fingers</b><p>With fries</p></div><span class="price">15</span></div>
+                <div class="dish"><img src="images/menu/wings.jpg" alt=""><div><b>Chicken wings</b><p>Buffalo, hot, or mild</p></div><span class="price">15</span></div>
+              </div>
+              <div class="sec">
+                <h4>Pije · Drinks</h4>
+                <div class="dish"><img src="images/menu/drinks.jpg" alt=""><div><b>Pije freskuese</b><p>Soft drink</p></div><span class="price">4</span></div>
+                <div class="dish"><img src="images/menu/drinks.jpg" alt=""><div><b>Golden Eagle</b></div><span class="price">5</span></div>
+                <div class="dish"><img src="images/menu/drinks.jpg" alt=""><div><b>Red Bull</b></div><span class="price">5</span></div>
+              </div>
+            </div>
+            <div>
+              <div class="sec">
+                <h4>Zgarë · Grill</h4>
+                <div class="dish"><img src="images/menu/qebapa.jpg" alt=""><div><b>Qebapa 10pc</b><p>Salad and fries</p></div><span class="price">15</span></div>
+                <div class="dish"><img src="images/menu/burger.jpg" alt=""><div><b>Hamburger</b><p>Fries or patate</p></div><span class="price">15</span></div>
+                <div class="dish"><img src="images/menu/qofte.jpg" alt=""><div><b>Qofte 3pc</b><p>Salad and fries</p></div><span class="price">15</span></div>
+                <div class="dish"><img src="images/menu/qofte.jpg" alt=""><div><b>Qofte 2pc</b><p>Salad and fries</p></div><span class="price">10</span></div>
+                <div class="dish"><img src="images/menu/sofra.jpg" alt=""><div><b>Mixed grill · 2 people</b></div><span class="price">50</span></div>
+                <div class="dish"><img src="images/menu/sofra.jpg" alt=""><div><b>Mixed grill · 3 people</b></div><span class="price">75</span></div>
+                <div class="dish"><img src="images/menu/sofra.jpg" alt=""><div><b>Mixed grill · 4 people</b></div><span class="price">100</span></div>
+                <div class="dish"><img src="images/menu/lamb-milk.jpg" alt=""><div><b>Mish qingji me qumësht</b><p>Lamb with milk · per person 25</p></div><span class="price">25–100</span></div>
+              </div>
+              <div class="sec">
+                <h4>Biftek · Steak</h4>
+                <div class="dish"><img src="images/menu/ribeye.jpg" alt=""><div><b>Rib eye</b><p>Vegetables, spinach</p></div><span class="price">35</span></div>
+                <div class="dish"><img src="images/menu/tbone.jpg" alt=""><div><b>T-bone</b><p>Vegetables, baked potato</p></div><span class="price">30</span></div>
+              </div>
+              <div class="sec">
+                <h4>Pasta</h4>
+                <div class="dish"><img src="images/menu/jufka.jpg" alt=""><div><b>Jufka Dibër</b><p>Lamb or chicken</p></div><span class="price">15</span></div>
+                <div class="dish"><img src="images/menu/penne.jpg" alt=""><div><b>Penne pasta sauce</b></div><span class="price">10</span></div>
+                <div class="dish"><img src="images/menu/penne.jpg" alt=""><div><b>Penne vodka sauce</b></div><span class="price">12</span></div>
+                <div class="dish"><img src="images/menu/francese.jpg" alt=""><div><b>Chicken francese / Alfredo</b></div><span class="price">12</span></div>
+                <div class="dish"><img src="images/menu/francese.jpg" alt=""><div><b>Chicken marsala</b></div><span class="price">15</span></div>
+                <div class="dish"><img src="images/menu/calamari.jpg" alt=""><div><b>Fried calamari</b></div><span class="price">15</span></div>
+              </div>
+              <div class="sec">
+                <h4>Pije alkoolike · Alcohol</h4>
+                <div class="dish"><img src="images/menu/alcohol.jpg" alt=""><div><b>Raki shtëpie</b></div><span class="price">5</span></div>
+                <div class="dish"><img src="images/menu/alcohol.jpg" alt=""><div><b>Raki muskat</b></div><span class="price">6</span></div>
+                <div class="dish"><img src="images/menu/alcohol.jpg" alt=""><div><b>Raki Perla</b></div><span class="price">8</span></div>
+                <div class="dish"><img src="images/menu/alcohol.jpg" alt=""><div><b>Konjak</b></div><span class="price">10</span></div>
+                <div class="dish"><img src="images/menu/alcohol.jpg" alt=""><div><b>Verë glass</b><p>Red or white</p></div><span class="price">10</span></div>
+                <div class="dish"><div><b>Shishe verë</b><p>Red 35 · White 40</p></div><span class="price">35 / 40</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/store.js"></script>
+  <script src="js/guest.js"></script>
+</body>
+</html>

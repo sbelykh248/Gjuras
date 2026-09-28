@@ -17,6 +17,8 @@
   }
 
   document.getElementById("doors").addEventListener("click", enter);
+  const enterBtn = document.getElementById("enter-door");
+  if (enterBtn) enterBtn.addEventListener("click", enter);
 
   function todayISO() {
     const d = new Date();
@@ -90,7 +92,7 @@
     const bits = [];
     if (b.phone) bits.push("text to " + b.phone);
     if (b.email) bits.push("email to " + b.email);
-    msg.textContent = "Booked " + b.id + " · " + b.date + " " + b.time + " · " + bits.join(" and ") + ". Open Staff to see it. A live carrier text/email is not in this file — the desk is the proof tonight.";
+    msg.textContent = "Booked " + b.id + " · " + b.date + " " + b.time + " · " + bits.join(" and ") + ". Open Staff to see it.";
     renderSlots();
   });
 })();

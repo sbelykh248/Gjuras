@@ -1,68 +1,68 @@
 # Gjuras
 
-1560 Bath Ave · 315-231-5541  
-food, coffee and good times
+**1560 Bath Avenue**  
+315-231-5541  
+Food, coffee and good times
 
-## Open in VS Code
+Public site: https://sbelykh248.github.io/Gjuras/
 
-1. Unzip so the folder contains `index.html`, `manager.html`, `js/`, `images/`.
-2. File → Open Folder on that folder.
-3. Install the **Live Server** extension.
-4. Right-click `index.html` → Open with Live Server.
+This folder is the guest site and the staff desk for Gjuras. Guests see the storefront, the menu, and a table request. Managers see reservations, daily tickets by station, and a simple stock list.
 
-Click the right-hand door with the handle. That leaf swings. You are in the room.
+---
 
-- Click the dining room or **Reserve a table** → booking form. You get a confirmation code.
-- Click the bar → menu.
-- **Staff** in the header → manager desk.
+## Staff desk
 
-## Demo staff login
+Address: `manager.html` on the same site  
+https://sbelykh248.github.io/Gjuras/manager.html
 
+| | |
+|---|---|
+| Email | `manager@gjuras.local` |
+| Password | `BathAve1560!` |
+
+Change this password before any live use. The current login is for demonstration only.
+
+---
+
+## How to open it
+
+**Preferred:** the GitHub Pages link above (HTTPS). Use this on the laptop and the phone.
+
+**Local preview:** unzip so `index.html` sits next to `js/` and `images/`. In that folder run Live Server, or:
+
+```text
+python -m http.server 5500
 ```
-manager@gjuras.local
-BathAve1560!
-```
 
-Change this before anyone real uses it. The password is hashed in the browser and the session lives in `sessionStorage` for 8 hours. That is a **prototype**, not bank-grade auth.
+Then open `http://127.0.0.1:5500/`  
+Do not double-click the HTML file for a client meeting.
 
-## Do not lie to a owner about this file
+---
 
-This zip is a floor demo plus a staff notebook that lives in one browser. It is not Toast. It is not OpenTable. It is not PCI. Two phones do not share one book. A teenager with DevTools can read the hashed demo password flow. If you tell an owner it is "bank secure" you are selling fiction.
+## What guests can do
 
-What it is good for: walk through the door, show the paper menu on a screen, take a sample reservation, log a cash/card ticket, tap stock up and down. That is the pitch. The $500–$1000 job is hosting this on HTTPS and wiring the notebook to a real database.
+- Enter from the storefront
+- Read the menu
+- Request a table (name plus phone or email)
+- Call the house
 
-## What is real vs placeholder
+## What staff can do
 
-Real from the photo: name, phone, address, storefront.
+- Sign in to the desk
+- See and update reservation status
+- Log a cash or card ticket by station (grill, kitchen, bar)
+- Adjust walk-in stock against par
 
-Placeholder until you shoot the room: interior photo, bar photo, dish photos, menu prices.
+---
 
-Working on this machine:
+## Scope
 
-- Reservation requests write to `localStorage` and show up on the staff desk.
-- Staff can Confirm → Seat → Paid / Cancel.
-- Seating a party adds covers and dollars to the week so the budget bars move.
-- Login lockout after five bad tries (one minute).
+This build is a working front and a working desk for approval. Reservations on the public link stay on each browser until a shared database is connected. Guest texts and card deposits are not included.
 
-Not real yet (needs a host + a backend):
+Next paid step: host plus a shared book (Firebase or Supabase) and, if required, email or SMS confirmation.
 
-- HTTPS in production (Netlify / Cloudflare Pages turn it on for free).
-- A server that stores bookings if two managers use two phones.
-- Card payments, Uber Eats, DoorDash.
-- POS sales pulled from Toast / Square instead of the seed numbers.
+---
 
-## Put it on HTTPS
+## Contact for this project
 
-Drag the folder onto https://app.netlify.com/drop  
-or Cloudflare Pages. `netlify.toml` already sets frame-deny, nosniff, HSTS, CSP.
-
-## Production next step (when they pay)
-
-Swap `js/store.js` for Supabase or Firebase:
-
-- Email/password or magic link for managers
-- `bookings` table with row-level security
-- Optional Stripe or Square for deposits
-- Toast / Square sales CSV or API into the week view
-
-Until then this is the floor + the desk, running in the browser.
+Replace hours and the About paragraph with copy from the family before calling the site final.
